@@ -12,6 +12,10 @@ create table public.profiles (
 
 alter table public.profiles enable row level security;
 
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON TABLE public.profiles
+TO anon, authenticated;
+
 create table public.recipes (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -25,6 +29,10 @@ create table public.recipes (
 );
 
 alter table public.recipes enable row level security;
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON TABLE public.recipes
+TO anon, authenticated;
 
 create index recipes_user_id_idx on public.recipes (user_id);
 create index recipes_category_idx on public.recipes (category);
@@ -112,12 +120,3 @@ on public.recipes
 for delete
 to authenticated
 using (user_id = (select auth.uid()));
-
-revoke all on public.profiles from anon, authenticated;
-revoke all on public.recipes from anon, authenticated;
-
-grant select on public.profiles to anon, authenticated;
-grant update on public.profiles to authenticated;
-
-grant select on public.recipes to anon, authenticated;
-grant insert, update, delete on public.recipes to authenticated;
