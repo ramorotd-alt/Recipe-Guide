@@ -10,6 +10,8 @@ create table public.profiles (
   updated_at timestamptz not null default now()
 );
 
+alter table public.profiles enable row level security;
+
 create table public.recipes (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -21,6 +23,8 @@ create table public.recipes (
   difficulty text not null check (difficulty in ('easy', 'medium', 'hard')),
   category text not null check (char_length(btrim(category)) between 1 and 40)
 );
+
+alter table public.recipes enable row level security;
 
 create index recipes_user_id_idx on public.recipes (user_id);
 create index recipes_category_idx on public.recipes (category);
@@ -70,9 +74,6 @@ $$;
 create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
-
-alter table public.profiles enable row level security;
-alter table public.recipes enable row level security;
 
 create policy "profiles are publicly readable"
 on public.profiles
