@@ -12,7 +12,7 @@ export default function SignUpPage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">Create an account</h1>
         <p className="text-zinc-600 dark:text-zinc-400">
-          Sign up with email. A profile is created for you when the account is confirmed.
+          Sign up with email. A profile is created from your email address when the account is confirmed.
         </p>
       </div>
       <SignUpForm />

@@ -10,6 +10,7 @@ import {
   validatePassword,
   type AuthFormState,
 } from "@/lib/auth";
+import { ensureProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signIn(
@@ -31,7 +32,7 @@ export async function signIn(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     const unconfirmed = error.message.toLowerCase().includes("email not confirmed");
@@ -41,6 +42,9 @@ export async function signIn(
         : "Email or password is incorrect.",
     };
   }
+
+  const profileError = await saveProfile(supabase, data.user?.id, data.user?.email);
+  if (profileError) return { message: profileError };
 
   redirect(nextPath);
 }
@@ -74,7 +78,20 @@ export async function signUp(
     return { message: "Check your email to confirm your account." };
   }
 
+  const profileError = await saveProfile(supabase, data.user?.id, data.user?.email);
+  if (profileError) return { message: profileError };
+
   redirect("/dashboard");
+}
+
+async function saveProfile(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string | undefined,
+  email: string | undefined,
+): Promise<string | undefined> {
+  if (!userId || !email) return "Your profile could not be saved.";
+  const profile = await ensureProfile(supabase, userId, email);
+  return profile.ok ? undefined : profile.message;
 }
 
 export async function signOut() {
