@@ -77,53 +77,6 @@ export async function signUp(
   redirect("/");
 }
 
-export async function requestPasswordReset(
-  _state: AuthFormState | undefined,
-  formData: FormData,
-): Promise<AuthFormState> {
-  const email = readText(formData, "email").trim();
-  const emailError = validateEmail(email);
-  if (emailError) {
-    return { fieldErrors: { email: emailError } };
-  }
-
-  const origin = await getRequestOrigin();
-  const supabase = await createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?next=/reset-password/update`,
-  });
-
-  if (error) {
-    return { message: "Could not send the reset email. Try again in a minute." };
-  }
-
-  return { message: "If an account exists for that email, a reset link is on the way." };
-}
-
-export async function updatePassword(
-  _state: AuthFormState | undefined,
-  formData: FormData,
-): Promise<AuthFormState> {
-  const password = readText(formData, "password");
-  const passwordError = validatePassword(password);
-  if (passwordError) {
-    return { fieldErrors: { password: passwordError } };
-  }
-
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  if (!data?.claims) {
-    return { message: "This reset link is no longer valid. Request a new one." };
-  }
-
-  const { error } = await supabase.auth.updateUser({ password });
-  if (error) {
-    return { message: error.message };
-  }
-
-  redirect("/");
-}
-
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();

@@ -11,9 +11,6 @@ export function SiteHeader() {
           Recipe Guide
         </Link>
         <nav className="flex items-center gap-4">
-          <Link href="/#recipes" className="text-sm font-medium underline-offset-4 hover:underline">
-            Recipes
-          </Link>
           <Suspense fallback={<span className="text-sm text-zinc-500">Sign in</span>}>
             <AuthMenu />
           </Suspense>

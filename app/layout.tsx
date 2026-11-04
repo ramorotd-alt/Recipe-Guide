@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Recipe Guide",
-  description: "Browse recipes by title, ingredient, or category.",
+  description: "Create an account and share recipes.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
