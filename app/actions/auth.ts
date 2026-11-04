@@ -18,7 +18,7 @@ export async function signIn(
 ): Promise<AuthFormState> {
   const email = readText(formData, "email").trim();
   const password = readText(formData, "password");
-  const nextPath = safeNextPath(readText(formData, "next"));
+  const nextPath = safeNextPath(readText(formData, "next"), "/dashboard");
   const emailError = validateEmail(email);
 
   if (emailError || password.length === 0) {
@@ -74,7 +74,7 @@ export async function signUp(
     return { message: "Check your email to confirm your account." };
   }
 
-  redirect("/");
+  redirect("/dashboard");
 }
 
 export async function signOut() {

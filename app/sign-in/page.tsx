@@ -39,5 +39,5 @@ async function SignInPanel({
   const params = await searchParams;
   const notice = params.error === "link" ? "That email link is invalid or has expired." : undefined;
 
-  return <SignInForm nextPath={safeNextPath(params.next)} notice={notice} />;
+  return <SignInForm nextPath={safeNextPath(params.next, "/dashboard")} notice={notice} />;
 }
