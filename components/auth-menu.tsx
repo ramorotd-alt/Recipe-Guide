@@ -17,9 +17,12 @@ export async function AuthMenu() {
   }
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
       <Link href="/dashboard" className="text-sm font-medium underline-offset-4 hover:underline">
         Dashboard
+      </Link>
+      <Link href="/profile" className="text-sm font-medium underline-offset-4 hover:underline">
+        Profile
       </Link>
       <form action={signOut} className="flex items-center gap-3">
         <span className="max-w-40 truncate text-sm text-zinc-600 dark:text-zinc-400">{email}</span>

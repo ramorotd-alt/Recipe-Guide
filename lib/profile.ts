@@ -6,6 +6,19 @@ type AppClient = SupabaseClient<Database>;
 
 export type ProfileResult = { ok: true; userId: string } | { ok: false; message: string };
 
+export type ProfileField = "fullName" | "userName" | "bio";
+
+export type ProfileFormState = {
+  message?: string;
+  fieldErrors?: Partial<Record<ProfileField, string>>;
+};
+
+export type ProfileDetails = {
+  fullName: string;
+  userName: string;
+  bio: string;
+};
+
 export function userNameFromEmail(email: string): string {
   const local = (email.split("@")[0] ?? "").toLowerCase();
   const candidate = local.replace(/[^a-z0-9_]/g, "").slice(0, 20);
@@ -16,6 +29,34 @@ export function userNameWithSuffix(base: string, userId: string): string {
   const suffix = userId.replace(/-/g, "").slice(0, 8);
   const trimmed = base.slice(0, 30 - suffix.length - 1);
   return `${trimmed}_${suffix}`;
+}
+
+export function validateProfileDetails(input: {
+  fullName: string;
+  userName: string;
+  bio: string;
+}): { fieldErrors?: ProfileFormState["fieldErrors"]; value?: ProfileDetails } {
+  const fieldErrors: NonNullable<ProfileFormState["fieldErrors"]> = {};
+  const fullName = input.fullName.trim().replace(/\s+/g, " ");
+  const userName = input.userName.trim().toLowerCase();
+  const bio = input.bio.trim();
+
+  if (fullName.length < 1 || fullName.length > 80) {
+    fieldErrors.fullName = "Use 1 to 80 characters.";
+  }
+  if (!/^[a-z0-9_]{2,30}$/.test(userName)) {
+    fieldErrors.userName = "Use 2 to 30 letters, numbers, or underscores.";
+  }
+  if (bio.length > 500) {
+    fieldErrors.bio = "Use 500 characters or fewer.";
+  }
+
+  if (Object.keys(fieldErrors).length > 0) return { fieldErrors };
+  return { value: { fullName, userName, bio } };
+}
+
+export function isMissingBioColumn(error: { message: string }): boolean {
+  return error.message.toLowerCase().includes("bio");
 }
 
 export function fullNameFromEmail(email: string): string {

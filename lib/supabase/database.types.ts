@@ -1,6 +1,6 @@
 /**
  * Columns from the Supabase schema diagram:
- * profiles: id, user_name, full_name, created_at, updated_at
+ * profiles: id, user_name, full_name, bio, created_at, updated_at
  * recipes: id, created_at, user_id, title, ingredients, instructions, cooking_time, difficulty, category
  */
 export type Database = {
@@ -11,6 +11,7 @@ export type Database = {
           id: string;
           user_name: string;
           full_name: string | null;
+          bio: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -18,6 +19,7 @@ export type Database = {
           id: string;
           user_name: string;
           full_name?: string | null;
+          bio?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -25,6 +27,7 @@ export type Database = {
           id?: string;
           user_name?: string;
           full_name?: string | null;
+          bio?: string | null;
           created_at?: string;
           updated_at?: string;
         };

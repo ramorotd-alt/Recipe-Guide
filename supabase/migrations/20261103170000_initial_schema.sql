@@ -6,6 +6,7 @@ create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   user_name text not null unique check (char_length(btrim(user_name)) between 2 and 30),
   full_name text check (full_name is null or char_length(btrim(full_name)) between 1 and 80),
+  bio text check (bio is null or char_length(btrim(bio)) between 1 and 500),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
