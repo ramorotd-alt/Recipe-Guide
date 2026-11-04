@@ -59,26 +59,16 @@ const recipes: HomeRecipe[] = [
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col bg-white font-sans text-zinc-950 dark:bg-black dark:text-zinc-50">
-      <header className="border-b border-zinc-200 dark:border-zinc-800">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4">
-          <p className="text-lg font-semibold">Recipe Guide</p>
-          <a href="#recipes" className="text-sm font-medium underline-offset-4 hover:underline">
-            Recipes
-          </a>
-        </div>
-      </header>
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-8">
-        <section className="flex flex-col gap-2">
-          <h1 className="text-3xl font-semibold tracking-tight">Find a recipe</h1>
-          <p className="max-w-xl text-zinc-600 dark:text-zinc-400">
-            Browse a few dishes by name, ingredient, or category.
-          </p>
-        </section>
-        <section id="recipes" aria-label="Recipe list">
-          <HomeRecipes recipes={recipes} />
-        </section>
-      </main>
-    </div>
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-8">
+      <section className="flex flex-col gap-2">
+        <h1 className="text-3xl font-semibold tracking-tight">Find a recipe</h1>
+        <p className="max-w-xl text-zinc-600 dark:text-zinc-400">
+          Browse a few dishes by name, ingredient, or category.
+        </p>
+      </section>
+      <section id="recipes" aria-label="Recipe list">
+        <HomeRecipes recipes={recipes} />
+      </section>
+    </main>
   );
 }
