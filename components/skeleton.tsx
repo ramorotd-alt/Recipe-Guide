@@ -120,6 +120,26 @@ export function ProfileFormSkeleton() {
   );
 }
 
+export function SavedResultsSkeleton() {
+  return (
+    <LoadingState label="Loading saved recipes">
+      <RecipeCardGrid />
+    </LoadingState>
+  );
+}
+
+export function SavedLoading() {
+  return (
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-8">
+      <div aria-hidden="true" className="flex flex-col gap-2">
+        <Skeleton className="h-9 w-28" />
+        <Skeleton className="h-5 w-64 max-w-full" />
+      </div>
+      <SavedResultsSkeleton />
+    </main>
+  );
+}
+
 export function ProfileLoading() {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-10">

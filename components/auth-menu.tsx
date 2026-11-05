@@ -24,6 +24,9 @@ export async function AuthMenu() {
       <Link href="/profile" className="text-sm font-medium underline-offset-4 hover:underline">
         Profile
       </Link>
+      <Link href="/saved" className="text-sm font-medium underline-offset-4 hover:underline">
+        Saved
+      </Link>
       <form action={signOut} className="flex items-center gap-3">
         <span className="max-w-40 truncate text-sm text-zinc-600 dark:text-zinc-400">{email}</span>
         <button type="submit" className="text-sm font-medium underline-offset-4 hover:underline">

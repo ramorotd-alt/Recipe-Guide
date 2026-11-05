@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -18,6 +19,9 @@ export default function ProfilePage() {
         <p className="text-zinc-600 dark:text-zinc-400">
           Update the name and bio other cooks see with your recipes.
         </p>
+        <Link href="/saved" className="text-sm font-medium underline-offset-4 hover:underline">
+          Saved recipes
+        </Link>
       </div>
       <Suspense fallback={<ProfileFormSkeleton />}>
         <ProfileEditor />
