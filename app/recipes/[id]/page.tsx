@@ -5,6 +5,10 @@ import { Suspense } from "react";
 
 import { authorLabel } from "@/components/recipes/recipe-cards";
 import { DeleteRecipeButton } from "@/components/recipes/delete-recipe-button";
+import { RecipeComments } from "@/components/recipes/recipe-comments";
+import { RecipeLikes } from "@/components/recipes/recipe-likes";
+import { RecipeDetailLoading } from "@/components/skeleton";
+import { commentWasEdited, commentWhen } from "@/lib/comment";
 import { createClient } from "@/lib/supabase/server";
 
 function isRecipeId(value: string) {
@@ -26,7 +30,7 @@ export async function generateMetadata({ params }: RecipePageProps): Promise<Met
 
 export default function RecipePage({ params }: RecipePageProps) {
   return (
-    <Suspense fallback={<p className="px-4 py-10 text-sm text-zinc-500">Loading recipe…</p>}>
+    <Suspense fallback={<RecipeDetailLoading />}>
       <RecipeDetail params={params} />
     </Suspense>
   );
@@ -48,13 +52,28 @@ async function RecipeDetail({ params }: RecipePageProps) {
 
   if (!recipe) notFound();
 
-  const { data: author } = await supabase
-    .from("profiles")
-    .select("full_name, user_name")
-    .eq("id", recipe.user_id)
-    .maybeSingle();
+  const userId = claimsData?.claims?.sub ?? null;
+  const [authorResult, likesResult, mineLikeResult, commentsResult] = await Promise.all([
+    supabase.from("profiles").select("full_name, user_name").eq("id", recipe.user_id).maybeSingle(),
+    supabase.from("likes").select("id", { count: "exact", head: true }).eq("recipe_id", recipe.id),
+    userId
+      ? supabase.from("likes").select("id").eq("recipe_id", recipe.id).eq("user_id", userId).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+    supabase
+      .from("comments")
+      .select("id, body, created_at, updated_at, user_id")
+      .eq("recipe_id", recipe.id)
+      .order("created_at", { ascending: true }),
+  ]);
 
-  const isOwner = claimsData?.claims?.sub === recipe.user_id;
+  const comments = commentsResult.data ?? [];
+  const commentAuthorIds = [...new Set(comments.map((comment) => comment.user_id))];
+  const { data: commentProfiles } = commentAuthorIds.length
+    ? await supabase.from("profiles").select("id, user_name, full_name").in("id", commentAuthorIds)
+    : { data: [] };
+  const commentAuthors = new Map((commentProfiles ?? []).map((profile) => [profile.id, profile]));
+  const isOwner = userId === recipe.user_id;
+  const signInHref = `/sign-in?next=/recipes/${recipe.id}`;
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-10">
@@ -62,7 +81,7 @@ async function RecipeDetail({ params }: RecipePageProps) {
         <p className="text-sm text-zinc-500">{recipe.category}</p>
         <h1 className="text-3xl font-semibold tracking-tight">{recipe.title}</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          {authorLabel(author ?? undefined)} · {recipe.cooking_time} min · {recipe.difficulty}
+          {authorLabel(authorResult.data ?? undefined)} · {recipe.cooking_time} min · {recipe.difficulty}
         </p>
         {isOwner ? (
           <div className="flex items-center gap-4">
@@ -81,6 +100,28 @@ async function RecipeDetail({ params }: RecipePageProps) {
         <h2 className="text-lg font-semibold">Instructions</h2>
         <p className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{recipe.instructions}</p>
       </section>
+      <RecipeLikes
+        recipeId={recipe.id}
+        count={likesResult.count ?? 0}
+        liked={Boolean(mineLikeResult.data)}
+        signedIn={Boolean(userId)}
+        signInHref={signInHref}
+        error={Boolean(likesResult.error)}
+      />
+      <RecipeComments
+        recipeId={recipe.id}
+        signedIn={Boolean(userId)}
+        signInHref={signInHref}
+        error={Boolean(commentsResult.error)}
+        comments={comments.map((comment) => ({
+          id: comment.id,
+          author: authorLabel(commentAuthors.get(comment.user_id)),
+          when: commentWhen(comment.created_at),
+          edited: commentWasEdited(comment.created_at, comment.updated_at),
+          body: comment.body,
+          isOwner: userId === comment.user_id,
+        }))}
+      />
       <p className="text-sm text-zinc-600 dark:text-zinc-400">
         <Link href="/dashboard" className="underline-offset-4 hover:underline">
           Back to dashboard

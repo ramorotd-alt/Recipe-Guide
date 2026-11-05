@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { buttonClassName } from "@/components/auth/fields";
 import { RecipeSearch } from "@/components/recipes/recipe-search";
+import { DashboardResultsSkeleton } from "@/components/skeleton";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
@@ -26,7 +27,7 @@ export default function DashboardPage() {
           Add a recipe
         </Link>
       </section>
-      <Suspense fallback={<p className="text-sm text-zinc-500">Loading recipes…</p>}>
+      <Suspense fallback={<DashboardResultsSkeleton />}>
         <RecipeLists />
       </Suspense>
     </main>
@@ -57,18 +58,50 @@ async function RecipeLists() {
 
   const mine = mineResult.data ?? [];
   const others = othersResult.data ?? [];
-  const authorIds = [...new Set([...mine, ...others].map((recipe) => recipe.user_id))];
-  const { data: profiles } = authorIds.length
-    ? await supabase.from("profiles").select("id, user_name, full_name").in("id", authorIds)
-    : { data: [] };
+  const recipes = [...mine, ...others];
+  const authorIds = [...new Set(recipes.map((recipe) => recipe.user_id))];
+  const recipeIds = recipes.map((recipe) => recipe.id);
+  const [profilesResult, likesResult, commentsResult] = await Promise.all([
+    authorIds.length
+      ? supabase.from("profiles").select("id, user_name, full_name").in("id", authorIds)
+      : Promise.resolve({ data: [] }),
+    recipeIds.length
+      ? supabase.from("likes").select("recipe_id").in("recipe_id", recipeIds)
+      : Promise.resolve({ data: [] }),
+    recipeIds.length
+      ? supabase.from("comments").select("recipe_id").in("recipe_id", recipeIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const likeCounts = countByRecipe(likesResult.data ?? []);
+  const commentCounts = countByRecipe(commentsResult.data ?? []);
 
   return (
     <RecipeSearch
-      mine={mine}
-      others={others}
-      authors={profiles ?? []}
+      mine={withActivity(mine, likeCounts, commentCounts)}
+      others={withActivity(others, likeCounts, commentCounts)}
+      authors={profilesResult.data ?? []}
       mineError={Boolean(mineResult.error)}
       othersError={Boolean(othersResult.error)}
     />
   );
+}
+
+function countByRecipe(rows: { recipe_id: string }[]) {
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    counts.set(row.recipe_id, (counts.get(row.recipe_id) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function withActivity<T extends { id: string }>(
+  recipes: T[],
+  likeCounts: Map<string, number>,
+  commentCounts: Map<string, number>,
+) {
+  return recipes.map((recipe) => ({
+    ...recipe,
+    likeCount: likeCounts.get(recipe.id) ?? 0,
+    commentCount: commentCounts.get(recipe.id) ?? 0,
+  }));
 }

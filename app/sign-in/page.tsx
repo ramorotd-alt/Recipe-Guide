@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { SignInForm } from "@/components/auth/sign-in-form";
+import { SignInFormSkeleton } from "@/components/skeleton";
 import { safeNextPath } from "@/lib/auth";
 
 export const metadata = {
@@ -19,7 +20,7 @@ export default function SignInPage({
         <h1 className="text-3xl font-semibold tracking-tight">Sign in</h1>
         <p className="text-zinc-600 dark:text-zinc-400">Use the email and password for your account.</p>
       </div>
-      <Suspense fallback={<p className="text-sm text-zinc-500">Loading sign in…</p>}>
+      <Suspense fallback={<SignInFormSkeleton />}>
         <SignInPanel searchParams={searchParams} />
       </Suspense>
       <p className="text-sm text-zinc-600 dark:text-zinc-400">

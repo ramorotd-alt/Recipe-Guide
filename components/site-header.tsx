@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { AuthMenu } from "@/components/auth-menu";
+import { AccountMenuSkeleton } from "@/components/skeleton";
 
 export function SiteHeader() {
   return (
@@ -11,7 +12,7 @@ export function SiteHeader() {
           Recipe Guide
         </Link>
         <nav className="flex items-center gap-4">
-          <Suspense fallback={<span className="text-sm text-zinc-500">Sign in</span>}>
+          <Suspense fallback={<AccountMenuSkeleton />}>
             <AuthMenu />
           </Suspense>
         </nav>

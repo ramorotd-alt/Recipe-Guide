@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { commentLabel, likeLabel } from "@/lib/social-text";
+
 export type RecipeSummary = {
   id: string;
   title: string;
@@ -8,6 +10,8 @@ export type RecipeSummary = {
   cooking_time: number;
   difficulty: string;
   user_id: string;
+  likeCount: number;
+  commentCount: number;
 };
 
 export function authorLabel(
@@ -38,6 +42,9 @@ export function RecipeCards({
             </p>
             <p className="mt-3 text-sm text-zinc-500">
               {recipe.cooking_time} min · {recipe.difficulty}
+            </p>
+            <p className="mt-1 text-sm text-zinc-500">
+              {likeLabel(recipe.likeCount)} · {commentLabel(recipe.commentCount)}
             </p>
           </Link>
         </li>

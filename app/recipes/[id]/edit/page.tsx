@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { RecipeForm } from "@/components/recipes/recipe-form";
+import { RecipeFormSkeleton } from "@/components/skeleton";
 import { difficulties, type Difficulty } from "@/lib/recipe";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,7 +26,7 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
         <h1 className="text-3xl font-semibold tracking-tight">Edit recipe</h1>
         <p className="text-zinc-600 dark:text-zinc-400">Update a recipe you shared.</p>
       </div>
-      <Suspense fallback={<p className="text-sm text-zinc-500">Loading recipe…</p>}>
+      <Suspense fallback={<RecipeFormSkeleton />}>
         <EditRecipeForm params={params} />
       </Suspense>
     </main>

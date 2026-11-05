@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { RecipeForm } from "@/components/recipes/recipe-form";
+import { RecipeFormSkeleton } from "@/components/skeleton";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
@@ -18,7 +19,7 @@ export default function NewRecipePage() {
           Share a recipe with other cooks. It shows up on their dashboards.
         </p>
       </div>
-      <Suspense fallback={<p className="text-sm text-zinc-500">Loading the form…</p>}>
+      <Suspense fallback={<RecipeFormSkeleton />}>
         <SignedInRecipeForm />
       </Suspense>
       <p className="text-sm text-zinc-600 dark:text-zinc-400">

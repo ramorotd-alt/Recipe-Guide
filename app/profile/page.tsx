@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { ProfileForm } from "@/components/profile/profile-form";
+import { ProfileFormSkeleton } from "@/components/skeleton";
 import { ensureProfile, isMissingBioColumn } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 
@@ -18,7 +19,7 @@ export default function ProfilePage() {
           Update the name and bio other cooks see with your recipes.
         </p>
       </div>
-      <Suspense fallback={<p className="text-sm text-zinc-500">Loading profile…</p>}>
+      <Suspense fallback={<ProfileFormSkeleton />}>
         <ProfileEditor />
       </Suspense>
     </main>
