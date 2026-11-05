@@ -3,14 +3,14 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { buttonClassName } from "@/components/auth/fields";
-import { RecipeCards, type RecipeSummary } from "@/components/recipes/recipe-cards";
+import { RecipeSearch } from "@/components/recipes/recipe-search";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
   title: "Dashboard · Recipe Guide",
 };
 
-const recipeColumns = "id, title, category, cooking_time, difficulty, user_id";
+const recipeColumns = "id, title, category, ingredients, cooking_time, difficulty, user_id";
 
 export default function DashboardPage() {
   return (
@@ -61,53 +61,14 @@ async function RecipeLists() {
   const { data: profiles } = authorIds.length
     ? await supabase.from("profiles").select("id, user_name, full_name").in("id", authorIds)
     : { data: [] };
-  const authors = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
 
   return (
-    <div className="flex flex-col gap-10">
-      <RecipeSection
-        title="Your recipes"
-        recipes={mine}
-        authors={authors}
-        error={Boolean(mineResult.error)}
-        empty="You have not shared a recipe yet."
-      />
-      <RecipeSection
-        title="Recipes from other cooks"
-        recipes={others}
-        authors={authors}
-        error={Boolean(othersResult.error)}
-        empty="No recipes from other cooks yet."
-      />
-    </div>
-  );
-}
-
-function RecipeSection({
-  title,
-  recipes,
-  authors,
-  error,
-  empty,
-}: {
-  title: string;
-  recipes: RecipeSummary[];
-  authors: Map<string, { full_name: string | null; user_name: string }>;
-  error: boolean;
-  empty: string;
-}) {
-  return (
-    <section className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
-      {error ? (
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">Recipes could not be loaded.</p>
-      ) : recipes.length === 0 ? (
-        <p className="rounded-md border border-dashed border-zinc-300 px-4 py-8 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-          {empty}
-        </p>
-      ) : (
-        <RecipeCards recipes={recipes} authors={authors} />
-      )}
-    </section>
+    <RecipeSearch
+      mine={mine}
+      others={others}
+      authors={profiles ?? []}
+      mineError={Boolean(mineResult.error)}
+      othersError={Boolean(othersResult.error)}
+    />
   );
 }

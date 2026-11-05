@@ -4,6 +4,7 @@ export type RecipeSummary = {
   id: string;
   title: string;
   category: string;
+  ingredients: string;
   cooking_time: number;
   difficulty: string;
   user_id: string;
