@@ -38,5 +38,7 @@ async function SignedInRecipeForm() {
     redirect("/sign-in?next=/recipes/new");
   }
 
-  return <RecipeForm />;
+  return (
+    <RecipeForm mode="create" submitLabel="Share recipe" pendingLabel="Sharing…" />
+  );
 }
